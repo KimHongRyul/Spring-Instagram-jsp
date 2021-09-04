@@ -2,21 +2,27 @@ package com.cos.photogramstart.config.auth;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.cos.photogramstart.domain.user.User;
 
 import lombok.Data;
 
 @Data
-public class PrincipalDetails implements UserDetails{
+public class PrincipalDetails implements UserDetails , OAuth2User{
 	
-	private User user;
 	private static final long serialVersionUID = 1L;
+	private User user;
+	private Map<String, Object> attributes;
 	
 	public PrincipalDetails(User user) {
+		this.user = user;
+	}
+	public PrincipalDetails(User user, Map<String, Object> attributes) {
 		this.user = user;
 	}
 	// 권한 : 한개가 아닐 수 있음 (3개 이상의 권한)
@@ -56,6 +62,17 @@ public class PrincipalDetails implements UserDetails{
 	@Override // 계정이 활성화 되었나? (휴면 계정)
 	public boolean isEnabled() {
 		return true;
+	}
+	
+	// OAuth 
+	@Override
+	public Map<String, Object> getAttributes() {
+		return attributes; // {id , name , email}
+	}
+	
+	@Override
+	public String getName() {
+		return (String) attributes.get("name");
 	}
 
 }
